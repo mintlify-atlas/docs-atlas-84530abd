@@ -1,0 +1,234 @@
+---
+title: Get Post
+description: Retrieve a single post by its unique identifier
+---
+
+## Endpoint
+
+```http
+GET /v1/{organizationId}/posts/{postId}
+```
+
+Retrieves detailed information for a specific post within an organization. Optionally filter by status and content type.
+
+## Authentication
+
+This endpoint requires Bearer token authentication. Include your API key in the Authorization header:
+
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Path Parameters
+
+<ParamField path="organizationId" type="string" required>
+  The unique identifier of the organization. The API key must have access to this organization.
+  
+  Example: `org_123`
+</ParamField>
+
+<ParamField path="postId" type="string" required>
+  The unique identifier of the post to retrieve.
+  
+  Example: `post_123`
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="status" type="string[]" default="[published]">
+  Filter by status. The post will only be returned if it matches one of the specified statuses.
+  
+  Options: `draft` | `published`
+  
+  Default: `["published"]` (only return if post is published)
+  
+  Examples:
+  - Single value: `?status=published`
+  - Multiple values: `?status=draft&status=published`
+</ParamField>
+
+<ParamField query="contentType" type="string[]">
+  Filter by content type. The post will only be returned if it matches one of the specified content types.
+  
+  Options: `changelog` | `linkedin_post`
+  
+  Default: All content types
+  
+  Examples:
+  - Single value: `?contentType=changelog`
+  - Multiple values: `?contentType=changelog&contentType=linkedin_post`
+</ParamField>
+
+## Response
+
+<ResponseField name="post" type="object | null">
+  The post object if found and matches the filter criteria, otherwise `null`.
+  
+  <Expandable title="Post Object">
+    <ResponseField name="id" type="string">
+      Unique identifier for the post.
+    </ResponseField>
+    
+    <ResponseField name="title" type="string">
+      The title of the post.
+    </ResponseField>
+    
+    <ResponseField name="content" type="string">
+      The content of the post in its original format.
+    </ResponseField>
+    
+    <ResponseField name="markdown" type="string">
+      The markdown representation of the post content.
+    </ResponseField>
+    
+    <ResponseField name="contentType" type="string">
+      The type of content. Options: `changelog` | `linkedin_post`
+    </ResponseField>
+    
+    <ResponseField name="sourceMetadata" type="object | null">
+      Additional metadata about the source of the post. Can be `null` if no metadata is available.
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Publication status. Options: `draft` | `published`
+    </ResponseField>
+    
+    <ResponseField name="createdAt" type="string">
+      ISO 8601 timestamp when the post was created.
+    </ResponseField>
+    
+    <ResponseField name="updatedAt" type="string">
+      ISO 8601 timestamp when the post was last updated.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Examples
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://api.notra.ai/v1/org_123/posts/post_456" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Get Draft Post
+curl -X GET "https://api.notra.ai/v1/org_123/posts/post_456?status=draft" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Filter by Content Type
+curl -X GET "https://api.notra.ai/v1/org_123/posts/post_456?contentType=changelog" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```javascript JavaScript/TypeScript
+const response = await fetch(
+  'https://api.notra.ai/v1/org_123/posts/post_456',
+  {
+    headers: {
+      'Authorization': 'Bearer YOUR_API_KEY'
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data.post);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.notra.ai/v1/org_123/posts/post_456',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY'
+    }
+)
+
+data = response.json()
+print(data['post'])
+```
+</CodeGroup>
+
+### Response Examples
+
+```json 200 Success - Post Found
+{
+  "post": {
+    "id": "post_456",
+    "title": "New Feature Release v2.0",
+    "content": "We're excited to announce the release of version 2.0 with major improvements to performance and usability.",
+    "markdown": "# New Feature Release v2.0\n\nWe're excited to announce the release of version 2.0 with major improvements to performance and usability.\n\n## What's New\n\n- Enhanced performance\n- Improved UI/UX\n- Bug fixes",
+    "contentType": "changelog",
+    "sourceMetadata": {
+      "author": "john@example.com",
+      "version": "2.0.0",
+      "platform": "web"
+    },
+    "status": "published",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T14:30:00.000Z"
+  }
+}
+```
+
+```json 200 Success - Post Not Found
+{
+  "post": null
+}
+```
+
+<Tabs>
+  <Tab title="Not Found Scenarios">
+    The `post` field will be `null` in the following cases:
+    
+    - The post ID does not exist
+    - The post exists but belongs to a different organization
+    - The post exists but doesn't match the status filter (e.g., requesting a draft post when `status=published`)
+    - The post exists but doesn't match the content type filter
+    
+    The endpoint returns a 200 status with `{ "post": null }` rather than a 404 error in these cases.
+  </Tab>
+</Tabs>
+
+```json 400 Bad Request
+{
+  "error": "Invalid path params or query"
+}
+```
+
+```json 401 Unauthorized
+{
+  "error": "Missing or invalid API key"
+}
+```
+
+```json 403 Forbidden
+{
+  "error": "Forbidden: organization access denied"
+}
+```
+
+```json 503 Service Unavailable
+{
+  "error": "Authentication service unavailable"
+}
+```
+
+## Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | Request successful - check the `post` field to determine if a post was found |
+| 400  | Invalid path params or query parameters |
+| 401  | Missing or invalid API key |
+| 403  | Forbidden - API key does not have access to the specified organization |
+| 503  | Authentication service unavailable |
+
+## Notes
+
+- This endpoint returns a 200 status code even when the post is not found. Check if `post` is `null` to determine if the post exists and matches your filters
+- The default behavior is to only return `published` posts unless you explicitly specify the `status` query parameter
+- To retrieve a post regardless of status, include both values: `?status=draft&status=published`
+- The API key must belong to the organization specified in the path, otherwise a 403 error will be returned
+- The post must exist within the specified organization and match all query filters to be returned

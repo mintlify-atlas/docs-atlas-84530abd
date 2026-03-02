@@ -1,0 +1,124 @@
+---
+title: 'Introduction'
+description: 'Welcome to the Notra API documentation'
+---
+
+## Overview
+
+The Notra REST API provides programmatic access to your organization's content. Built on OpenAPI 3.1.1 standards, the API enables you to retrieve posts and manage content workflows.
+
+## Base URL
+
+All API requests should be made to:
+
+```
+https://api.usenotra.com
+```
+
+## API Version
+
+The current API version is `v1`. All endpoints are prefixed with `/v1`:
+
+```
+https://api.usenotra.com/v1/{organizationId}/posts
+```
+
+## OpenAPI Specification
+
+The complete OpenAPI 3.1.1 schema is available at:
+
+```
+https://api.usenotra.com/openapi.json
+```
+
+You can use this schema with tools like Postman, Insomnia, or code generators to automatically create client libraries.
+
+<Note>
+The API uses Bearer token authentication for all `/v1/*` endpoints. See the [Authentication](/api/authentication) page for details.
+</Note>
+
+## Quick Start
+
+Here's a minimal example to get you started:
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.usenotra.com/v1/{organizationId}/posts \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.usenotra.com/v1/{organizationId}/posts',
+  {
+    headers: {
+      'Authorization': 'Bearer YOUR_API_KEY'
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data.posts);
+```
+
+```python Python
+import requests
+
+headers = {
+    'Authorization': 'Bearer YOUR_API_KEY'
+}
+
+response = requests.get(
+    'https://api.usenotra.com/v1/{organizationId}/posts',
+    headers=headers
+)
+
+data = response.json()
+print(data['posts'])
+```
+
+</CodeGroup>
+
+## Available Endpoints
+
+The Notra API currently provides the following content endpoints:
+
+- **List Posts** - `GET /v1/{organizationId}/posts` - Retrieve a paginated list of posts
+- **Get Post** - `GET /v1/{organizationId}/posts/{postId}` - Fetch a single post by ID
+
+For detailed endpoint documentation, see the [API Reference](/api/endpoints/list-posts) section.
+
+## Response Format
+
+All API responses are returned in JSON format with appropriate HTTP status codes:
+
+- `200` - Success
+- `400` - Invalid request parameters
+- `401` - Missing or invalid API key
+- `403` - Insufficient permissions or organization access denied
+- `503` - Authentication service unavailable
+
+## Health Check
+
+You can verify the API status using the health check endpoint:
+
+```bash
+curl https://api.usenotra.com/ping
+```
+
+Expected response:
+```
+pong
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api/authentication">
+    Learn how to generate and use API keys
+  </Card>
+  <Card title="Rate Limits" icon="gauge" href="/api/rate-limits">
+    Understand API rate limits and best practices
+  </Card>
+</CardGroup>

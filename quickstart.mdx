@@ -1,80 +1,438 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Quick Start Guide"
+description: "Generate your first AI-powered content in under 5 minutes"
 ---
 
-## Get started in three steps
-
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+This guide walks you through setting up Notra, connecting GitHub, configuring your brand voice, and generating your first piece of content.
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  **Before you begin:** You'll need a GitHub account with access to at least one repository. Notra works best with repositories that have recent pull request activity.
 </Note>
+
+## Step 1: Create Your Organization
+
+After signing up for Notra, you'll be prompted to create your organization workspace.
+
+<Steps>
+  <Step title="Set Organization Details">
+    Enter your **organization name** (e.g., "Acme Inc") and a **URL-friendly slug** (e.g., "acme-inc"). The slug will be used in your workspace URL: `app.usenotra.com/acme-inc`
+    
+    ```tsx
+    // Organization is created via the auth client
+    await authClient.organization.create({
+      name: "Acme Inc",
+      slug: "acme-inc",
+      websiteUrl: "https://example.com"
+    });
+    ```
+  </Step>
+  
+  <Step title="Optional: Add Your Website">
+    If you provide your website URL (e.g., "example.com"), Notra can automatically extract your brand identity, tone, and company description to help generate on-brand content.
+  </Step>
+  
+  <Step title="Access Your Dashboard">
+    Once created, you'll be redirected to your organization dashboard at `/{slug}` where you can manage integrations, content, and automation.
+  </Step>
+</Steps>
+
+<Tip>
+  The organization slug cannot be changed after creation, so choose something that represents your company or team.
+</Tip>
+
+## Step 2: Connect Your First GitHub Integration
+
+Notra generates content from GitHub activity like merged pull requests, releases, and commits.
+
+<Steps>
+  <Step title="Navigate to Integrations">
+    From your dashboard, go to **Integrations** in the sidebar. You'll see a list of available integrations including GitHub, Linear, and Slack.
+  </Step>
+  
+  <Step title="Click Connect on GitHub">
+    Click the **Connect** button on the GitHub integration card. This will open a dialog where you can add a repository.
+    
+    <Info>
+      Notra supports both **public** and **private** repositories. For private repositories, you'll need to provide a GitHub personal access token.
+    </Info>
+  </Step>
+  
+  <Step title="Add Repository URL or Owner/Repo">
+    Enter your repository information in one of these formats:
+    - Full URL: `https://github.com/usenotra/notra`
+    - Owner/Repo: `usenotra/notra`
+    
+    Notra will automatically detect if the repository is public or private.
+  </Step>
+  
+  <Step title="Add Access Token for Private Repos">
+    If you're connecting a private repository, you'll need to provide a GitHub personal access token with `repo` scope.
+    
+    <Accordion title="How to create a GitHub personal access token">
+      1. Go to [GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)](https://github.com/settings/tokens)
+      2. Click **Generate new token (classic)**
+      3. Give it a descriptive name like "Notra Integration"
+      4. Select the **repo** scope for full repository access
+      5. Click **Generate token** and copy the token
+      6. Paste the token into the Notra integration dialog
+    </Accordion>
+  </Step>
+  
+  <Step title="Configure Branch and Outputs">
+    - Select the **default branch** (usually `main` or `master`)
+    - Choose which **content types** to enable:
+      - **Changelog** - Technical release notes
+      - **Blog Post** - Feature announcements
+      - **Twitter Post** - Social media updates
+      - **LinkedIn Post** - Professional network updates
+    
+    ```json
+    {
+      "outputs": {
+        "changelog": { "enabled": true },
+        "blog_post": { "enabled": true },
+        "twitter_post": { "enabled": true },
+        "linkedin_post": { "enabled": false }
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Save Integration">
+    Click **Add Integration** to save. Your GitHub repository is now connected and ready to generate content.
+  </Step>
+</Steps>
+
+<Warning>
+  For private repositories, keep your GitHub token secure. Notra stores it encrypted and only uses it to access repository data for content generation.
+</Warning>
+
+## Step 3: Configure Your Brand Voice
+
+Tell Notra how to write in your unique voice so all generated content matches your brand.
+
+<Steps>
+  <Step title="Navigate to Brand Identity">
+    From your dashboard sidebar, click **Brand** → **Identity**.
+  </Step>
+  
+  <Step title="Auto-Extract Brand Information (Optional)">
+    If you provided your website URL during organization setup, Notra can automatically analyze your website to extract:
+    - Company description
+    - Brand tone and style
+    - Target audience
+    - Writing guidelines
+    
+    Click **Analyze** to start the automated brand extraction. This takes about 30-60 seconds.
+    
+    <AccordionGroup>
+      <Accordion title="How brand analysis works">
+        Notra scrapes your website homepage and key pages, then uses AI to extract brand information through a multi-step process:
+        1. **Scraping** - Fetch website content
+        2. **Extracting** - AI analyzes tone, style, and messaging
+        3. **Saving** - Store brand profile for content generation
+      </Accordion>
+    </AccordionGroup>
+  </Step>
+  
+  <Step title="Review and Customize Company Profile">
+    Edit the auto-extracted information or manually enter:
+    - **Company Name** - Your product or company name
+    - **Website** - Your company website
+    - **Description** - A brief overview of what your company does
+  </Step>
+  
+  <Step title="Set Tone & Language">
+    Choose your content tone:
+    
+    **Preset Tone Profiles:**
+    - **Conversational** - Friendly, approachable, casual
+    - **Professional** - Polished, formal, business-focused
+    - **Casual** - Relaxed, informal, personable
+    - **Formal** - Traditional, serious, authoritative
+    
+    **Or use Custom Tone:**
+    - Define your own tone guidelines (e.g., "Technical but accessible, enthusiastic about developer experience")
+    
+    **Custom Instructions:**
+    - Add specific rules for content generation (e.g., "Always mention 'developers' instead of 'users'", "Avoid marketing jargon")
+  </Step>
+  
+  <Step title="Define Your Target Audience">
+    Describe who you're writing for:
+    - Their role (developers, product managers, executives)
+    - Their pain points and interests
+    - What matters to them
+    
+    Example: "Software engineers and DevOps teams who value automation, reliability, and clear technical documentation"
+  </Step>
+  
+  <Step title="Save Changes">
+    Changes are **auto-saved** as you type. You'll see a success toast when your brand settings are updated.
+  </Step>
+</Steps>
+
+<Tip>
+  You can **re-analyze** your website anytime by clicking the refresh icon next to the Company Profile heading. This is useful if you've updated your website branding.
+</Tip>
+
+## Step 4: Generate Your First Content
+
+Now that you've connected GitHub and configured your brand, you're ready to generate content from your repository activity.
+
+<Tabs>
+  <Tab title="Scheduled Workflow">
+    Create a workflow that runs automatically on a schedule.
+    
+    <Steps>
+      <Step title="Navigate to Automation → Schedules">
+        From your dashboard sidebar, click **Automation** → **Schedules**.
+      </Step>
+      
+      <Step title="Create New Schedule">
+        Click **New Schedule** to open the schedule configuration dialog.
+      </Step>
+      
+      <Step title="Configure Schedule Settings">
+        - **Name**: Give your schedule a descriptive name (e.g., "Weekly Changelog")
+        - **Frequency**: Choose Daily, Weekly, or Monthly
+        - **Time**: Set the time in UTC when the schedule should run
+        - **Day**: For weekly schedules, choose the day of the week
+        
+        Example weekly schedule:
+        ```json
+        {
+          "frequency": "weekly",
+          "dayOfWeek": 5,  // Friday
+          "hour": 17,       // 5 PM
+          "minute": 0       // :00
+        }
+        ```
+      </Step>
+      
+      <Step title="Select Repository">
+        Choose which GitHub integration(s) to analyze for content generation.
+      </Step>
+      
+      <Step title="Choose Output Type">
+        Select the content type to generate:
+        - Changelog
+        - Blog Post
+        - Twitter Post
+        - LinkedIn Post
+        - Investor Update
+      </Step>
+      
+      <Step title="Set Lookback Window">
+        Choose how far back to analyze activity:
+        - **24 hours** - Daily updates
+        - **7 days** - Weekly summaries
+        - **30 days** - Monthly roundups
+      </Step>
+      
+      <Step title="Save and Enable">
+        Click **Create Schedule**. Your workflow is now active and will run automatically at the specified time.
+      </Step>
+      
+      <Step title="Run Now (Optional)">
+        Click the **•••** menu on your schedule and select **Run now** to test content generation immediately without waiting for the scheduled time.
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="Event-Based Trigger">
+    Create a trigger that responds to GitHub webhook events in real-time.
+    
+    <Steps>
+      <Step title="Navigate to Automation → Events">
+        From your dashboard sidebar, click **Automation** → **Events**.
+      </Step>
+      
+      <Step title="Create New Event Trigger">
+        Click **New Event Trigger** to open the configuration dialog.
+      </Step>
+      
+      <Step title="Select GitHub Webhook Source">
+        Choose **GitHub webhook** as the trigger source type.
+      </Step>
+      
+      <Step title="Choose Event Types">
+        Select which GitHub events should trigger content generation:
+        - **Pull Request Merged** - When a PR is merged
+        - **Release Published** - When a new release is created
+        - **Push to Branch** - When commits are pushed
+        
+        Or leave empty to trigger on **all events**.
+      </Step>
+      
+      <Step title="Select Target Repositories">
+        Choose which GitHub integrations should trigger this workflow.
+      </Step>
+      
+      <Step title="Choose Output Type">
+        Select what content to generate when the event occurs (Changelog, Blog Post, etc.).
+      </Step>
+      
+      <Step title="Save Event Trigger">
+        Click **Create Trigger**. Notra will now generate content automatically whenever the specified GitHub events occur.
+      </Step>
+    </Steps>
+    
+    <Info>
+      Event-based triggers react immediately to GitHub activity, while scheduled workflows run at specific times and analyze a range of activity.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Step 5: View and Edit Generated Content
+
+Once content is generated (either from a schedule running or an event trigger), it will appear in your Content dashboard.
+
+<Steps>
+  <Step title="Navigate to Content">
+    Click **Content** in the dashboard sidebar to see all generated posts.
+  </Step>
+  
+  <Step title="Browse Content">
+    Content is organized by date with the most recent posts first. You can:
+    - Switch between **Grid view** and **Table view**
+    - Filter by content type (Changelog, Blog Post, etc.)
+    - See post status (Draft or Published)
+  </Step>
+  
+  <Step title="Open a Post">
+    Click on any content card to open the full editor with:
+    - **Markdown editor** with live preview
+    - **AI chat assistant** to refine content
+    - **Source metadata** showing which PRs/issues were analyzed
+  </Step>
+  
+  <Step title="Edit Content">
+    You can:
+    - Directly edit the markdown
+    - Use the AI assistant to rewrite sections
+    - Adjust the title
+    - Change content type
+  </Step>
+  
+  <Step title="Publish">
+    When ready, change the status from **Draft** to **Published**. The content is now marked as finalized.
+  </Step>
+</Steps>
+
+<Tip>
+  All generated content starts as a **Draft** so you can review and refine before marking it as published.
+</Tip>
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="Set Up More Integrations" icon="plug" href="/integrations/overview">
+    Connect Linear and Slack to pull activity from more sources
+  </Card>
+  
+  <Card title="Create Advanced Workflows" icon="gears" href="/automation/overview">
+    Build sophisticated automation with multiple triggers and outputs
+  </Card>
+  
+  <Card title="Understand the Pipeline" icon="diagram-project" href="/concepts/content-pipeline">
+    Learn how Notra analyzes activity and generates content
+  </Card>
+  
+  <Card title="Use the API" icon="code" href="/api/introduction">
+    Access content programmatically and build custom integrations
+  </Card>
+</CardGroup>
+
+## Example Workflows
+
+<AccordionGroup>
+  <Accordion title="Weekly Engineering Update" icon="calendar-week">
+    **Goal:** Automatically generate a changelog every Friday summarizing the week's work.
+    
+    **Setup:**
+    1. Go to **Automation → Schedules**
+    2. Create a schedule named "Weekly Engineering Update"
+    3. Set frequency to **Weekly**, day to **Friday**, time to **5:00 PM UTC**
+    4. Select all your GitHub integrations as targets
+    5. Choose **Changelog** as output type
+    6. Set lookback window to **7 days**
+    7. Save and enable
+    
+    **Result:** Every Friday at 5 PM, Notra generates a changelog from the week's merged PRs and commits.
+  </Accordion>
+  
+  <Accordion title="Instant Release Announcements" icon="rocket">
+    **Goal:** When you publish a GitHub release, automatically generate a blog post and social media updates.
+    
+    **Setup:**
+    1. Go to **Automation → Events**
+    2. Create 3 separate event triggers:
+       - Trigger 1: Output type **Blog Post**
+       - Trigger 2: Output type **Twitter Post**
+       - Trigger 3: Output type **LinkedIn Post**
+    3. For each trigger:
+       - Source: **GitHub webhook**
+       - Event type: **Release Published**
+       - Target: Your main repository
+    4. Save all three triggers
+    
+    **Result:** When you publish a release on GitHub, Notra generates a blog post draft and social media posts for review.
+  </Accordion>
+  
+  <Accordion title="Monthly Investor Update" icon="chart-line">
+    **Goal:** Generate a monthly summary of product progress for investors and stakeholders.
+    
+    **Setup:**
+    1. Go to **Automation → Schedules**
+    2. Create a schedule named "Monthly Investor Update"
+    3. Set frequency to **Monthly**, day to **1** (first of month), time to **9:00 AM UTC**
+    4. Select all repositories as targets
+    5. Choose **Investor Update** as output type
+    6. Set lookback window to **30 days**
+    7. Save and enable
+    
+    **Result:** On the first of every month, Notra generates a high-level summary of the previous month's achievements, features shipped, and progress metrics.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="GitHub integration not showing my repositories" icon="github">
+    - Make sure your GitHub token has the `repo` scope
+    - Verify the repository owner and name are correct
+    - Check that the token hasn't expired
+    - For organization repositories, ensure your token has access to the organization
+  </Accordion>
+  
+  <Accordion title="No content is being generated" icon="circle-exclamation">
+    - Verify your schedule or event trigger is **enabled** (not paused)
+    - Check that your GitHub integration has recent activity (merged PRs, commits)
+    - Ensure the lookback window includes the period when activity occurred
+    - Review the integration's enabled output types match your trigger's output type
+  </Accordion>
+  
+  <Accordion title="Generated content doesn't match my brand voice" icon="volume">
+    - Go to **Brand → Identity** and review your settings
+    - Add more specific custom instructions
+    - Use the custom tone field to provide detailed voice guidelines
+    - Describe your target audience more specifically
+    - If you provided a website, try re-analyzing it to refresh brand data
+  </Accordion>
+  
+  <Accordion title="Schedule not running at the expected time" icon="clock">
+    - Schedules run in **UTC timezone** - convert your local time to UTC
+    - Check the schedule status - make sure it's **Active**, not **Paused**
+    - View the schedule details to confirm the day/time settings are correct
+  </Accordion>
+</AccordionGroup>
+
+<Card
+  title="Need More Help?"
+  icon="circle-question"
+  href="https://github.com/usenotra/notra"
+  horizontal
+>
+  Visit our GitHub repository for additional documentation, examples, and community support
+</Card>

@@ -1,0 +1,297 @@
+---
+title: 'Rate Limits'
+description: 'Understand API rate limits and best practices for optimal performance'
+---
+
+## Overview
+
+The Notra API currently does not enforce hard rate limits on authenticated requests. However, we recommend following best practices to ensure optimal performance and reliability.
+
+<Note>
+While there are no enforced rate limits at this time, this is subject to change as the API evolves. We will notify users in advance before implementing any rate limiting policies.
+</Note>
+
+## Best Practices
+
+Even without enforced limits, following these guidelines will help ensure your integration remains performant and reliable:
+
+### 1. Implement Exponential Backoff
+
+If you receive error responses (5xx status codes), implement exponential backoff:
+
+<CodeGroup>
+
+```javascript JavaScript
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch(url, options);
+      
+      if (response.ok) {
+        return await response.json();
+      }
+      
+      // Retry on 5xx errors
+      if (response.status >= 500) {
+        const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // Don't retry on 4xx errors
+      throw new Error(`HTTP ${response.status}`);
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+    }
+  }
+}
+
+const data = await fetchWithRetry(
+  'https://api.usenotra.com/v1/{organizationId}/posts',
+  {
+    headers: {
+      'Authorization': `Bearer ${apiKey}`
+    }
+  }
+);
+```
+
+```python Python
+import time
+import requests
+from typing import Optional
+
+def fetch_with_retry(
+    url: str,
+    headers: dict,
+    max_retries: int = 3
+) -> Optional[dict]:
+    for i in range(max_retries):
+        try:
+            response = requests.get(url, headers=headers)
+            
+            if response.ok:
+                return response.json()
+            
+            # Retry on 5xx errors
+            if response.status_code >= 500:
+                delay = (2 ** i)  # 1s, 2s, 4s
+                time.sleep(delay)
+                continue
+            
+            # Don't retry on 4xx errors
+            response.raise_for_status()
+            
+        except requests.exceptions.RequestException as e:
+            if i == max_retries - 1:
+                raise e
+    
+    return None
+
+data = fetch_with_retry(
+    'https://api.usenotra.com/v1/{organizationId}/posts',
+    {'Authorization': f'Bearer {api_key}'}
+)
+```
+
+</CodeGroup>
+
+### 2. Use Pagination Efficiently
+
+When fetching large datasets, use the built-in pagination parameters:
+
+```bash
+curl "https://api.usenotra.com/v1/{organizationId}/posts?limit=50&page=1" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+<ParamField query="limit" type="number" default="50">
+  Number of items per page (max: 100)
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Page number to retrieve
+</ParamField>
+
+The response includes pagination metadata:
+
+```json
+{
+  "posts": [...],
+  "pagination": {
+    "limit": 50,
+    "currentPage": 1,
+    "nextPage": 2,
+    "previousPage": null,
+    "totalPages": 5,
+    "totalItems": 237
+  }
+}
+```
+
+### 3. Cache Responses When Possible
+
+Implement caching to reduce unnecessary API calls:
+
+```javascript
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getCachedPosts(organizationId, apiKey) {
+  const cacheKey = `posts_${organizationId}`;
+  const cached = cache.get(cacheKey);
+  
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  
+  const response = await fetch(
+    `https://api.usenotra.com/v1/${organizationId}/posts`,
+    {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`
+      }
+    }
+  );
+  
+  const data = await response.json();
+  
+  cache.set(cacheKey, {
+    data,
+    timestamp: Date.now()
+  });
+  
+  return data;
+}
+```
+
+### 4. Filter Requests at the API Level
+
+Use query parameters to filter data server-side instead of fetching everything:
+
+```bash
+# Filter by status and content type
+curl "https://api.usenotra.com/v1/{organizationId}/posts?status=published&contentType=article" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Available filters:
+
+<ParamField query="status" type="array">
+  Filter by post status: `draft`, `published`, `archived`
+</ParamField>
+
+<ParamField query="contentType" type="array">
+  Filter by content type: `article`, `video`, `podcast`, etc.
+</ParamField>
+
+<ParamField query="sort" type="string" default="desc">
+  Sort order: `asc` or `desc` (by creation date)
+</ParamField>
+
+### 5. Monitor Your Usage
+
+Track your API usage patterns:
+
+- Log request counts and response times
+- Monitor error rates
+- Set up alerts for unusual activity
+- Use the health check endpoint (`/ping`) for monitoring
+
+```javascript
+const stats = {
+  requests: 0,
+  errors: 0,
+  totalTime: 0
+};
+
+async function monitoredFetch(url, options) {
+  const start = Date.now();
+  stats.requests++;
+  
+  try {
+    const response = await fetch(url, options);
+    stats.totalTime += Date.now() - start;
+    
+    if (!response.ok) {
+      stats.errors++;
+    }
+    
+    return response;
+  } catch (error) {
+    stats.errors++;
+    throw error;
+  }
+}
+
+// Log stats periodically
+setInterval(() => {
+  console.log({
+    requests: stats.requests,
+    errors: stats.errors,
+    avgTime: stats.totalTime / stats.requests
+  });
+}, 60000); // Every minute
+```
+
+## Future Rate Limiting
+
+When rate limits are implemented, they will likely include:
+
+- **Per-key limits** - Limits based on your API key
+- **Per-organization limits** - Shared limits across all keys in an organization
+- **Burst allowances** - Short-term burst capacity for occasional spikes
+
+Rate limit information will be communicated via response headers:
+
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1640000000
+```
+
+<Warning>
+When rate limits are introduced, exceeding them will result in a `429 Too Many Requests` response. Your application should be prepared to handle this gracefully.
+</Warning>
+
+## Handling Rate Limit Errors (Future)
+
+When rate limits are implemented, handle 429 responses appropriately:
+
+```javascript
+async function handleRateLimit(response) {
+  if (response.status === 429) {
+    const resetTime = response.headers.get('X-RateLimit-Reset');
+    const waitTime = resetTime ? 
+      (parseInt(resetTime) * 1000 - Date.now()) : 
+      60000; // Default 1 minute
+    
+    console.log(`Rate limited. Waiting ${waitTime}ms`);
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+    
+    // Retry the request
+    return fetch(url, options);
+  }
+  
+  return response;
+}
+```
+
+## Contact Us
+
+If you anticipate needing higher rate limits or have specific requirements:
+
+- Contact our support team
+- Describe your use case and expected traffic patterns
+- We'll work with you to ensure your integration succeeds
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api/endpoints/list-posts">
+    Explore available endpoints
+  </Card>
+  <Card title="Authentication" icon="key" href="/api/authentication">
+    Learn about API key management
+  </Card>
+</CardGroup>

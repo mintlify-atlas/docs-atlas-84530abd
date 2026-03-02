@@ -1,0 +1,150 @@
+---
+title: Linear Integration
+description: Sync issues and project updates from Linear for automated content generation
+---
+
+<Note>
+  The Linear integration is **coming soon**. We're actively developing this feature and it will be available in an upcoming release.
+</Note>
+
+The Linear integration will allow you to connect your Linear workspace to Notra, enabling automatic content generation based on your project management activity.
+
+## Planned Features
+
+When the Linear integration launches, you'll be able to:
+
+- **Pull issue data**: Access issue titles, descriptions, status changes, and labels
+- **Track project progress**: Monitor completed issues and project milestones
+- **Sync team updates**: Capture project roadmap changes and cycle completions
+- **Generate content**: Create changelogs, blog posts, and investor updates from Linear activity
+
+## What Content Can Be Generated
+
+The Linear integration will support these content types:
+
+<CardGroup cols={2}>
+  <Card title="Changelog" icon="list-check">
+    Automatically generate release notes from completed issues and cycles.
+  </Card>
+  
+  <Card title="Blog Post" icon="newspaper">
+    Create feature announcements based on shipped issues and milestones.
+  </Card>
+  
+  <Card title="Investor Update" icon="chart-line">
+    Compile progress reports showing completed work across your roadmap.
+  </Card>
+  
+  <Card title="Social Posts" icon="share-nodes">
+    Share product updates and achievements on Twitter and LinkedIn.
+  </Card>
+</CardGroup>
+
+## Expected Setup Process
+
+When available, setting up the Linear integration will follow these steps:
+
+<Steps>
+  <Step title="Connect Linear Workspace">
+    Authenticate with Linear using OAuth to securely connect your workspace.
+  </Step>
+  
+  <Step title="Select Teams">
+    Choose which Linear teams Notra can access. You control exactly what data is shared.
+  </Step>
+  
+  <Step title="Configure Webhooks">
+    Set up webhooks to trigger content generation when issues are completed or cycles end.
+  </Step>
+  
+  <Step title="Enable Content Types">
+    Select which types of content to automatically generate from your Linear activity.
+  </Step>
+</Steps>
+
+## Planned Permissions
+
+The Linear integration will request these permissions:
+
+- **Read access to issues**: View issue details, status, and labels
+- **Read access to projects**: Access project and cycle information
+- **Read access to teams**: Get team names and members
+- **Webhook access**: Receive notifications about issue updates and completions
+
+<Info>
+  Like all Notra integrations, Linear access will be **read-only**. Notra will never create, modify, or delete issues in your workspace.
+</Info>
+
+## Use Cases
+
+### Automated Release Notes
+
+Generate changelogs when you complete a Linear cycle:
+
+- Pull all issues marked as "Done" in the completed cycle
+- Group by issue type (feature, bug, improvement)
+- Create formatted release notes highlighting what shipped
+- Automatically publish to your blog or changelog
+
+### Feature Announcements
+
+Create blog posts when significant features are completed:
+
+- Monitor high-priority issues with specific labels
+- Trigger content generation when they're marked complete
+- Include context from issue descriptions and comments
+- Generate customer-facing feature announcements
+
+### Progress Reports
+
+Build investor updates on a schedule:
+
+- Aggregate completed issues across teams
+- Calculate velocity and progress metrics
+- Highlight key achievements and milestones
+- Create comprehensive progress reports for stakeholders
+
+## Webhook Triggers
+
+Planned webhook events that will trigger content generation:
+
+- **Issue completed**: When an issue's status changes to "Done"
+- **Cycle completed**: When a project cycle ends
+- **Milestone reached**: When a specific project milestone is achieved
+- **Roadmap updated**: When significant roadmap changes occur
+
+## Data Security
+
+<Note>
+  - All Linear data will be accessed via official Linear APIs
+  - Authentication tokens will be encrypted and stored securely
+  - You can disconnect the integration at any time
+  - Notra will only access teams and projects you explicitly authorize
+</Note>
+
+## Get Notified
+
+Want to know when the Linear integration is ready?
+
+<CardGroup cols={1}>
+  <Card title="Join the Waitlist" icon="envelope">
+    Sign up to be notified when Linear integration launches. Early access will be available to waitlist members.
+  </Card>
+</CardGroup>
+
+## Alternative: GitHub Integration
+
+While Linear integration is in development, you can still automate your content:
+
+<Info>
+  Many teams use Linear alongside GitHub. If your development workflow connects Linear issues to GitHub pull requests, you can use the [GitHub integration](/integrations/github) to generate content from your merged work.
+</Info>
+
+<CardGroup cols={2}>
+  <Card title="GitHub Integration" icon="github" href="/integrations/github">
+    Connect GitHub now to start generating content from your development activity
+  </Card>
+  <Card title="Manual Generation" icon="play" href="/content/blog-posts">
+    Create content manually while waiting for Linear integration
+  </Card>
+</CardGroup>
