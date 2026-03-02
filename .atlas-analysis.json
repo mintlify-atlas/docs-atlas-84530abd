@@ -1,0 +1,108 @@
+{
+  "projectType": "saas",
+  "projectName": "Notra",
+  "projectDescription": "Turn your work into content with AI-powered automation that transforms GitHub PRs, Linear issues, and Slack conversations into ready-to-publish changelogs, blog posts, and social updates.",
+  "theme": "almond",
+  "primaryColor": "#6366F1",
+  "lightColor": "#818CF8",
+  "darkColor": "#4F46E5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/how-it-works",
+              "concepts/content-pipeline",
+              "concepts/brand-voice"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/overview",
+              "integrations/github",
+              "integrations/linear",
+              "integrations/slack"
+            ]
+          },
+          {
+            "group": "Automation",
+            "pages": [
+              "automation/overview",
+              "automation/event-based",
+              "automation/scheduled"
+            ]
+          },
+          {
+            "group": "Content Types",
+            "pages": [
+              "content/changelogs",
+              "content/blog-posts",
+              "content/social-media"
+            ]
+          },
+          {
+            "group": "Organization",
+            "pages": [
+              "organization/workspace-setup",
+              "organization/team-management",
+              "organization/billing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "api/introduction",
+              "api/authentication",
+              "api/rate-limits"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api/endpoints/list-posts",
+              "api/endpoints/get-post"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "api/webhooks/overview",
+              "api/webhooks/events"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "AI-powered content generation from work activity",
+    "GitHub, Linear, and Slack integrations",
+    "Automated changelogs, blog posts, and social media content",
+    "Event-driven and scheduled workflows",
+    "Brand voice customization",
+    "Organization and team management"
+  ],
+  "publicApiSurface": [
+    "GET /v1/{organizationId}/posts - List all posts",
+    "GET /v1/{organizationId}/posts/{postId} - Get a single post",
+    "POST /webhooks/github - GitHub webhook handler",
+    "POST /workflows/event - Event-based workflow trigger",
+    "POST /workflows/schedule - Scheduled workflow trigger"
+  ]
+}
